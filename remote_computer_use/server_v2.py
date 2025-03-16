@@ -9,12 +9,17 @@ from dataclasses import dataclass
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, Optional, Dict, Any, List
 import io
+import json
 from mcp.server.fastmcp import FastMCP, Image, Context
 from vnc_controller import VNCController
 from ssh_controller import SSHController
+from tools.computer import ComputerTool
 import time
-# import dotenv
-# dotenv.load_dotenv()
+import base64
+from PIL import Image
+from tools.computer import Action
+import dotenv
+dotenv.load_dotenv()
 
 # Create dataclass for app context
 @dataclass
@@ -78,13 +83,79 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 # Create MCP server
 mcp = FastMCP(
     "Computer Use",
-    dependencies=["pillow", "paramiko", "vncdotool"],
+    dependencies=["pillow", "paramiko", "vncdotool","python-dotenv"],
     lifespan=app_lifespan
 )
 
 
-# Define MCP tools
+def base64_to_pil(base64_str):
+    """
+    Convert a base64 string to a PIL Image object
+    
+    Args:
+        base64_str (str): The base64 string. If it contains metadata 
+                         (like 'data:image/jpeg;base64,'), it will be handled.
+    
+    Returns:
+        PIL.Image.Image: The PIL Image object
+    """
+    # If the base64 string includes metadata (data URI), remove it
+    if ',' in base64_str:
+        base64_str = base64_str.split(',')[1]
+    img_data = base64.b64decode(base64_str)
+    # img_buffer = io.BytesIO(img_data)
+    img = Image(data=img_data, format="png")
+    return img
+
+
 @mcp.tool()
+async def computer(ctx: Context, action: Action,coordinate: tuple[int, int] = None,text:str = None):
+    """Use a mouse and keyboard to interact with a computer, and take screenshots.
+    - This is an interface to a desktop GUI. You do not have access to a terminal or applications menu. You must click on desktop icons to start applications.
+    - Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions. E.g. if you click on Firefox and a window doesn't open, try taking another screenshot.
+    - The screen's resolution is {display_width_px}x{display_height_px}.
+    - The display number is {display_number}
+    - Whenever you intend to move the cursor to click on an element like an icon, you should consult a screenshot to determine the coordinates of the element before moving the cursor.
+    - If you tried clicking on a program or link but it failed to load, even after waiting, try adjusting your cursor position so that the tip of the cursor visually falls on the element that you want to click.
+    - Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.
+    - When you do `left_click` or `type` action, please make sure you do `mouse_move` to correct coordinates first.
+
+    
+    Args: 
+        action: The action to perform. The available actions are:
+                * `key`: Press a key or key-combination on the keyboard.
+                  - This supports xdotool's `key` syntax.
+                  - Examples: "a", "Return", "alt+Tab", "ctrl+s", "Up", "KP_0" (for the numpad 0 key).
+                * `type`: Type a string of text on the keyboard.
+                * `cursor_position`: Get the current (x, y) pixel coordinate of the cursor on the screen.
+                * `mouse_move`: Move the cursor to a specified (x, y) pixel coordinate on the screen.
+                * `left_click`: Click the left mouse button.
+                * `left_click_drag`: Click and drag the cursor to a specified (x, y) pixel coordinate on the screen.
+                * `right_click`: Click the right mouse button.
+                * `middle_click`: Click the middle mouse button.
+                * `double_click`: Double-click the left mouse button.
+                * `screenshot`: Take a screenshot of the screen.
+        coordinate: (x, y): This represents the center of the object. The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=mouse_move` and `action=left_click_drag`.
+        text: Required only by `action=type` and `action=key`.
+         
+    Returns: tool results
+    """ 
+    computer_tool = ComputerTool(ssh=ctx.request_context.lifespan_context.ssh,
+                                 vnc=ctx.request_context.lifespan_context.vnc)
+    tool_input = dict(action=action, coordinate=coordinate, text=text)
+    try:
+        result = await computer_tool(**tool_input)
+    except Exception as e:
+        raise ValueError(f"{e}")
+    
+    if result.base64_image:
+        return base64_to_pil(result.base64_image) 
+    else:
+        return {'output':result.output,"error":result.error}
+    
+
+# Define MCP tools
+# @mcp.tool()
 async def capture_region(ctx: Context,x: int, y: int, w: int, h: int) -> Image:
     """
     Capture screenshot only represents of a region of the remote desktop
@@ -128,7 +199,7 @@ async def capture_screenshot(ctx: Context) -> Image:
     
     return Image(data=img_bytes.getvalue(), format="png")
 
-@mcp.tool()
+# @mcp.tool()
 async def mouse_double_click(ctx: Context, x: int, y: int) -> Image:
     """
     Double-click the left mouse button at the specified coordinates
@@ -151,7 +222,7 @@ async def mouse_double_click(ctx: Context, x: int, y: int) -> Image:
     
     return  'Double-click executed, please capture a new screenshot in next turn to see the result'
 
-@mcp.tool()
+# @mcp.tool()
 async def mouse_click(ctx: Context, x: int, y: int, button: int = 1) -> Image:
     """
     Click at the specified coordinates and return a screenshot,
@@ -179,7 +250,7 @@ async def mouse_click(ctx: Context, x: int, y: int, button: int = 1) -> Image:
     
     return Image(data=img_bytes.getvalue(), format="png")
 
-@mcp.tool()
+# @mcp.tool()
 async def mouse_move(ctx: Context, x: int, y: int) -> Image:
     """
     Move mouse to the specified coordinates and return a screenshot
@@ -205,7 +276,7 @@ async def mouse_move(ctx: Context, x: int, y: int) -> Image:
     
     return Image(data=img_bytes.getvalue(), format="png")
 
-@mcp.tool()
+# @mcp.tool()
 async def mouse_scroll(ctx: Context, steps: int = 1, direction: str = "down") -> Image:
     """
     Scroll the mouse wheel and return a screenshot
@@ -233,7 +304,7 @@ async def mouse_scroll(ctx: Context, steps: int = 1, direction: str = "down") ->
     
     return Image(data=img_bytes.getvalue(), format="png")
 
-@mcp.tool()
+# @mcp.tool()
 async def type_text(ctx: Context, text: str) -> Image:
     """
     Type the specified text and return a screenshot
@@ -259,7 +330,7 @@ async def type_text(ctx: Context, text: str) -> Image:
     
     return Image(data=img_bytes.getvalue(), format="png")
 
-@mcp.tool()
+# @mcp.tool()
 async def key_press(ctx: Context, key: str) -> Image:
     """
     Press a key and return a screenshot
@@ -284,7 +355,7 @@ async def key_press(ctx: Context, key: str) -> Image:
     
     return Image(data=img_bytes.getvalue(), format="png")
 
-@mcp.tool()
+# @mcp.tool()
 async def execute_bash(ctx: Context, command: str,restart: bool= False) -> Dict[str, Any]:
     """
     Run commands in a bash shell

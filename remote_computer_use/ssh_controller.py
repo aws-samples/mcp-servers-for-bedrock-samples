@@ -70,7 +70,7 @@ class SSHController:
                 print(f"SSH disconnect error: {e}")
             finally:
                 self.client = None
-            
+                
     async def execute_command(self, command):
         """
         Execute command on remote server

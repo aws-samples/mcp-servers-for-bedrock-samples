@@ -21,6 +21,7 @@ sudo apt upgrade
 - install necessary apps
 ```bash
 sudo apt install -y xdotool
+sudo apt install -y scrot
 sudo add-apt-repository ppa:mozillateam/ppa && \
 sudo apt-get install -y --no-install-recommends \
 libreoffice \
