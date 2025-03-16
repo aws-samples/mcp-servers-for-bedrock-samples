@@ -14,7 +14,7 @@ from mcp.server.fastmcp import FastMCP, Image, Context
 from vnc_controller import VNCController
 from ssh_controller import SSHController
 from tools.computer import ComputerTool
-from tools.bash import BaseTool
+from tools.bash import BashTool
 import time
 import base64
 # from PIL import Image

@@ -105,13 +105,13 @@ class BashTool(BaseAnthropicTool):
         if restart:
             if self._session:
                 self._session.stop()
-            self._session = _BashSession(ssh_controller=ssh)
+            self._session = _BashSession(ssh_controller=self.ssh)
             await self._session.start()
 
             return ToolResult(system="tool has been restarted.")
 
         if self._session is None:
-            self._session = _BashSession(ssh_controller=ssh)
+            self._session = _BashSession(ssh_controller=self.ssh)
             await self._session.start()
 
         if command is not None:
