@@ -16,7 +16,7 @@ from ssh_controller import SSHController
 from tools.computer import ComputerTool
 import time
 import base64
-from PIL import Image
+# from PIL import Image
 from tools.computer import Action
 import dotenv
 dotenv.load_dotenv()
@@ -97,13 +97,12 @@ def base64_to_pil(base64_str):
                          (like 'data:image/jpeg;base64,'), it will be handled.
     
     Returns:
-        PIL.Image.Image: The PIL Image object
+        fastmcp: The fastmcp Image object
     """
     # If the base64 string includes metadata (data URI), remove it
     if ',' in base64_str:
         base64_str = base64_str.split(',')[1]
     img_data = base64.b64decode(base64_str)
-    # img_buffer = io.BytesIO(img_data)
     img = Image(data=img_data, format="png")
     return img
 
