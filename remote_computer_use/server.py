@@ -13,8 +13,8 @@ from mcp.server.fastmcp import FastMCP, Image, Context
 from vnc_controller import VNCController
 from ssh_controller import SSHController
 import time
-# import dotenv
-# dotenv.load_dotenv()
+import dotenv
+dotenv.load_dotenv()
 
 
 # Create dataclass for app context
@@ -116,7 +116,11 @@ async def capture_screenshot(ctx: Context) -> Image:
         Image: Screenshot of the remote desktop
     """
     vnc = ctx.request_context.lifespan_context.vnc
-    screenshot = await vnc.capture_screenshot()
+    try:
+        screenshot = await vnc.capture_screenshot()
+    except Exception as e:
+        raise ValueError(f"{e}")
+
     
     # Convert PIL Image to bytes
     img_bytes = io.BytesIO()
@@ -137,10 +141,13 @@ async def mouse_double_click(ctx: Context, x: int, y: int) -> Image:
         str: execution result
     """
     vnc = ctx.request_context.lifespan_context.vnc
-    await vnc.mouse_click(x, y, 1)
-    time.sleep(0.1)
-    await vnc.mouse_click(x, y, 1)
-    time.sleep(3)
+    try:
+        await vnc.mouse_click(x, y, 1)
+        time.sleep(0.1)
+        await vnc.mouse_click(x, y, 1)
+        time.sleep(3)
+    except:
+        raise ValueError(f"Failed to double-click, error:{e}")
     
     return  'Double-click executed, please capture a new screenshot in next turn to see the result'
 
@@ -158,10 +165,13 @@ async def mouse_click(ctx: Context, x: int, y: int, button: int = 1) -> Image:
         Image: Screenshot after clicking
     """
     vnc = ctx.request_context.lifespan_context.vnc
-    await vnc.mouse_click(x, y, button)
-    
-    # Capture screenshot after clicking
-    screenshot = await vnc.capture_screenshot()
+    try:
+        await vnc.mouse_click(x, y, button)
+        
+        # Capture screenshot after clicking
+        screenshot = await vnc.capture_screenshot()
+    except Exception as e:
+        raise ValueError(f"{e}")
     
     # Convert PIL Image to bytes
     img_bytes = io.BytesIO()
@@ -182,10 +192,12 @@ async def mouse_move(ctx: Context, x: int, y: int) -> Image:
         Image: Screenshot after moving mouse
     """
     vnc = ctx.request_context.lifespan_context.vnc
-    await vnc.mouse_move(x, y)
-    
-    # Capture screenshot after moving mouse
-    screenshot = await vnc.capture_screenshot()
+    try:
+        await vnc.mouse_move(x, y)
+        # Capture screenshot after moving mouse
+        screenshot = await vnc.capture_screenshot()
+    except Exception as e:
+        raise ValueError(f"{e}")
     
     # Convert PIL Image to bytes
     img_bytes = io.BytesIO()
@@ -206,10 +218,14 @@ async def mouse_scroll(ctx: Context, steps: int = 1, direction: str = "down") ->
         Image: Screenshot after scrolling
     """
     vnc = ctx.request_context.lifespan_context.vnc
-    await vnc.mouse_scroll(steps, direction)
     
-    # Capture screenshot after scrolling
-    screenshot = await vnc.capture_screenshot()
+    try:
+        await vnc.mouse_scroll(steps, direction)
+        
+        # Capture screenshot after scrolling
+        screenshot = await vnc.capture_screenshot()
+    except Exception as e:
+        raise ValueError(f"{e}")
     
     # Convert PIL Image to bytes
     img_bytes = io.BytesIO()
@@ -229,10 +245,13 @@ async def type_text(ctx: Context, text: str) -> Image:
         Image: Screenshot after typing text
     """
     vnc = ctx.request_context.lifespan_context.vnc
-    await vnc.type_text(text)
-    
-    # Capture screenshot after typing
-    screenshot = await vnc.capture_screenshot()
+    try :
+        await vnc.type_text(text)
+        
+        # Capture screenshot after typing
+        screenshot = await vnc.capture_screenshot()
+    except Exception as e:
+        raise ValueError(f"{e}")
     
     # Convert PIL Image to bytes
     img_bytes = io.BytesIO()
@@ -252,11 +271,13 @@ async def key_press(ctx: Context, key: str) -> Image:
         Image: Screenshot after pressing key
     """
     vnc = ctx.request_context.lifespan_context.vnc
-    await vnc.key_press(key)
-    
-    # Capture screenshot after pressing key
-    screenshot = await vnc.capture_screenshot()
-    
+    try:
+        await vnc.key_press(key)
+        
+        # Capture screenshot after pressing key
+        screenshot = await vnc.capture_screenshot()
+    except Exception as e:
+        raise ValueError(f"{e}")
     # Convert PIL Image to bytes
     img_bytes = io.BytesIO()
     screenshot.save(img_bytes, format="PNG")
@@ -284,7 +305,7 @@ async def execute_bash(ctx: Context, command: str,restart: bool= False) -> Dict[
         ssh_success = await ssh.connect()
         if not ssh_success:
             return "Failed to connect to SSH server on startup"
-        
+    
     result = await ssh.execute_command(f"{command}")
     return result
 

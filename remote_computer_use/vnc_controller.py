@@ -74,8 +74,8 @@ class VNCController:
                 image = Image.open(tmp.name)
                 return image
         except Exception as e:
-            print(f"Screenshot capture error: {e}")
-            raise
+            raise Exception(f"Screenshot capture error: {e}")
+            
         
     async def capture_region(self,x: int, y: int, w: int, h: int, incremental: bool = False):
         """
@@ -96,8 +96,8 @@ class VNCController:
                 image = Image.open(tmp.name)
                 return image
         except Exception as e:
-            print(f"Region Screenshot capture error: {e}")
-            raise
+            raise Exception(f"Region Screenshot capture error: {e}")
+            
         
     async def mouse_move(self, x, y):
         """
@@ -111,8 +111,11 @@ class VNCController:
             success = await self.connect()
             if not success:
                 raise Exception("Failed to connect to VNC server")
-        
-        await asyncio.to_thread(self.client.mouseMove, x, y)
+        try:
+            await asyncio.to_thread(self.client.mouseMove, x, y)
+        except Exception as e:
+            raise Exception(f"Mouse move error: {e}")
+            
         
     async def mouse_click(self, x, y, button=1):
         """
@@ -127,10 +130,13 @@ class VNCController:
             success = await self.connect()
             if not success:
                 raise Exception("Failed to connect to VNC server")
-        
-        await asyncio.to_thread(self.client.mouseMove, x, y)
-        await asyncio.to_thread(self.client.mousePress, button)
-        await asyncio.to_thread(self.client.mouseUp, button)
+        try:
+            await asyncio.to_thread(self.client.mousePress, button)
+            await asyncio.to_thread(self.client.mouseUp, button)
+            await asyncio.to_thread(self.client.mouseUp, button)
+        except Exception as e:
+            raise Exception(f"Mouse click error: {e}")
+            
     
     async def mouse_scroll(self, steps=1, direction="down"):
         """
@@ -148,8 +154,11 @@ class VNCController:
         button = 4 if direction == "up" else 5  # 4 = scroll up, 5 = scroll down
         
         for _ in range(steps):
-            await asyncio.to_thread(self.client.mousePress, button)
-            await asyncio.to_thread(self.client.mouseDown, button)
+            try:
+                await asyncio.to_thread(self.client.mousePress, button)
+                await asyncio.to_thread(self.client.mouseDown, button)
+            except Exception as e:
+                raise Exception(f"Mouse scroll error: {e}")
         
     async def type_text(self, text):
         """
@@ -167,7 +176,10 @@ class VNCController:
             for char in text:
                 self.client.keyPress(char)
         
-        await asyncio.to_thread(send_text, text)
+        try:
+            await asyncio.to_thread(send_text, text)
+        except Exception as e:
+            raise Exception(f"Text input error: {e}")
     
     async def key_press(self, key):
         """
@@ -181,4 +193,7 @@ class VNCController:
             if not success:
                 raise Exception("Failed to connect to VNC server")
         
-        await asyncio.to_thread(self.client.keyPress, key)
+        try:
+            await asyncio.to_thread(self.client.keyPress, key)
+        except Exception as e:
+            raise Exception(f"Key press error: {e}")
