@@ -13,9 +13,8 @@ from mcp.server.fastmcp import FastMCP, Image, Context
 from vnc_controller import VNCController
 from ssh_controller import SSHController
 import time
-import dotenv
-dotenv.load_dotenv()
-
+# import dotenv
+# dotenv.load_dotenv()
 
 # Create dataclass for app context
 @dataclass
@@ -79,9 +78,10 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 # Create MCP server
 mcp = FastMCP(
     "Computer Use",
-    dependencies=["pillow", "paramiko", "vncdotool","python-dotenv"],
+    dependencies=["pillow", "paramiko", "vncdotool"],
     lifespan=app_lifespan
 )
+
 
 # Define MCP tools
 @mcp.tool()
