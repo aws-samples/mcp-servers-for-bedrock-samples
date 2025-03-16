@@ -14,12 +14,13 @@ from mcp.server.fastmcp import FastMCP, Image, Context
 from vnc_controller import VNCController
 from ssh_controller import SSHController
 from tools.computer import ComputerTool
+from tools.bash import BaseTool
 import time
 import base64
 # from PIL import Image
 from tools.computer import Action
-import dotenv
-dotenv.load_dotenv()
+# import dotenv
+# dotenv.load_dotenv()
 
 # Create dataclass for app context
 @dataclass
@@ -108,7 +109,7 @@ def base64_to_pil(base64_str):
 
 
 @mcp.tool()
-async def computer(ctx: Context, action: Action,coordinate: tuple[int, int] = None,text:str = None):
+async def computer(ctx: Context, action: Action,coordinate: List[int] = None,text:str = None):
     """Use a mouse and keyboard to interact with a computer, and take screenshots.
     - This is an interface to a desktop GUI. You do not have access to a terminal or applications menu. You must click on desktop icons to start applications.
     - Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions. E.g. if you click on Firefox and a window doesn't open, try taking another screenshot.
@@ -134,7 +135,7 @@ async def computer(ctx: Context, action: Action,coordinate: tuple[int, int] = No
                 * `middle_click`: Click the middle mouse button.
                 * `double_click`: Double-click the left mouse button.
                 * `screenshot`: Take a screenshot of the screen.
-        coordinate: (x, y): This represents the center of the object. The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=mouse_move` and `action=left_click_drag`.
+        coordinate: [x, y]: This represents the center of the object. The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=mouse_move` and `action=left_click_drag`.
         text: Required only by `action=type` and `action=key`.
          
     Returns: tool results
@@ -152,210 +153,8 @@ async def computer(ctx: Context, action: Action,coordinate: tuple[int, int] = No
     else:
         return {'output':result.output,"error":result.error}
     
-
-# Define MCP tools
-# @mcp.tool()
-async def capture_region(ctx: Context,x: int, y: int, w: int, h: int) -> Image:
-    """
-    Capture screenshot only represents of a region of the remote desktop
-    
-    Args:
-        x: X coordinate (pixels from the left edge)
-        y: Y coordinate (pixels from the top edge)
-        w: Width of the region
-        h: Hight of the region
-        
-    Returns:
-        Image: Screenshot of the remote desktop
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    screenshot = await vnc.capture_region(x,y,w,h)
-    
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
-    
-    return Image(data=img_bytes.getvalue(), format="png")
-
 @mcp.tool()
-async def capture_screenshot(ctx: Context) -> Image:
-    """
-    Capture a screenshot of the remote desktop
-    
-    Returns:
-        Image: Screenshot of the remote desktop
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    try:
-        screenshot = await vnc.capture_screenshot()
-    except Exception as e:
-        raise ValueError(f"{e}")
-
-    
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
-    
-    return Image(data=img_bytes.getvalue(), format="png")
-
-# @mcp.tool()
-async def mouse_double_click(ctx: Context, x: int, y: int) -> Image:
-    """
-    Double-click the left mouse button at the specified coordinates
-    
-    Args:
-        x: X coordinate (pixels from the left edge)
-        y: Y coordinate (pixels from the top edge)
-        
-    Returns:
-        str: execution result
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    try:
-        await vnc.mouse_click(x, y, 1)
-        time.sleep(0.1)
-        await vnc.mouse_click(x, y, 1)
-        time.sleep(3)
-    except:
-        raise ValueError(f"Failed to double-click, error:{e}")
-    
-    return  'Double-click executed, please capture a new screenshot in next turn to see the result'
-
-# @mcp.tool()
-async def mouse_click(ctx: Context, x: int, y: int, button: int = 1) -> Image:
-    """
-    Click at the specified coordinates and return a screenshot,
-    
-    Args:
-        x: X coordinate (pixels from the left edge)
-        y: Y coordinate (pixels from the top edge)
-        button: Mouse button (1=Click the left mouse button, 2=Click the middle mouse button, 3=Click the right mouse button)
-        
-    Returns:
-        Image: Screenshot after clicking
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    try:
-        await vnc.mouse_click(x, y, button)
-        
-        # Capture screenshot after clicking
-        screenshot = await vnc.capture_screenshot()
-    except Exception as e:
-        raise ValueError(f"{e}")
-    
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
-    
-    return Image(data=img_bytes.getvalue(), format="png")
-
-# @mcp.tool()
-async def mouse_move(ctx: Context, x: int, y: int) -> Image:
-    """
-    Move mouse to the specified coordinates and return a screenshot
-
-    Args:
-        x: X coordinate (pixels from the left edge)
-        y: Y coordinate (pixels from the top edge)
-        
-    Returns:
-        Image: Screenshot after moving mouse
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    try:
-        await vnc.mouse_move(x, y)
-        # Capture screenshot after moving mouse
-        screenshot = await vnc.capture_screenshot()
-    except Exception as e:
-        raise ValueError(f"{e}")
-    
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
-    
-    return Image(data=img_bytes.getvalue(), format="png")
-
-# @mcp.tool()
-async def mouse_scroll(ctx: Context, steps: int = 1, direction: str = "down") -> Image:
-    """
-    Scroll the mouse wheel and return a screenshot
-    
-    Args:
-        steps: Number of scroll steps
-        direction: 'up' or 'down'
-        
-    Returns:
-        Image: Screenshot after scrolling
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    
-    try:
-        await vnc.mouse_scroll(steps, direction)
-        
-        # Capture screenshot after scrolling
-        screenshot = await vnc.capture_screenshot()
-    except Exception as e:
-        raise ValueError(f"{e}")
-    
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
-    
-    return Image(data=img_bytes.getvalue(), format="png")
-
-# @mcp.tool()
-async def type_text(ctx: Context, text: str) -> Image:
-    """
-    Type the specified text and return a screenshot
-    
-    Args:
-        text: Text to type
-        
-    Returns:
-        Image: Screenshot after typing text
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    try :
-        await vnc.type_text(text)
-        
-        # Capture screenshot after typing
-        screenshot = await vnc.capture_screenshot()
-    except Exception as e:
-        raise ValueError(f"{e}")
-    
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
-    
-    return Image(data=img_bytes.getvalue(), format="png")
-
-# @mcp.tool()
-async def key_press(ctx: Context, key: str) -> Image:
-    """
-    Press a key and return a screenshot
-    
-    Args:
-        key: Key to press (e.g., 'enter', 'escape', etc.)
-        
-    Returns:
-        Image: Screenshot after pressing key
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    try:
-        await vnc.key_press(key)
-        
-        # Capture screenshot after pressing key
-        screenshot = await vnc.capture_screenshot()
-    except Exception as e:
-        raise ValueError(f"{e}")
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
-    
-    return Image(data=img_bytes.getvalue(), format="png")
-
-# @mcp.tool()
-async def execute_bash(ctx: Context, command: str,restart: bool= False) -> Dict[str, Any]:
+async def bash(ctx: Context, command: str,restart: bool = None):
     """
     Run commands in a bash shell
     * When invoking this tool, the contents of the "command" parameter does NOT need to be XML-escaped.
@@ -363,21 +162,23 @@ async def execute_bash(ctx: Context, command: str,restart: bool= False) -> Dict[
     * State is persistent across command calls and discussions with the user.
     * To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.
     * Please avoid commands that may produce a very large amount of output.
-    * Please run long lived commands in the background, e.g. 'sleep 10 &' or start a server in the background.    
-    Args:
-        command: The bash command to run. Required unless the tool is being restarted.
-        restart: Specifying true will restart this tool. Otherwise, leave this unspecified. Defaut to False
-    Returns:
-        dict: Command execution result
-    """
-    ssh = ctx.request_context.lifespan_context.ssh
-    if restart:
-        ssh_success = await ssh.connect()
-        if not ssh_success:
-            return "Failed to connect to SSH server on startup"
+    * Please run long lived commands in the background, e.g. 'sleep 10 &' or start a server in the background.
     
-    result = await ssh.execute_command(f"{command}")
-    return result
+    Args: 
+        command: the bash command to run. Required unless the tool is being restarted.
+        restart: Specifying true will restart this tool. Otherwise, leave this unspecified.
+    
+    Returns: tool results
+    """
+    bash_tool = BashTool(ssh=ctx.request_context.lifespan_context.ssh)
+    tool_input = dict(command=command, restart=restart)
+    try:
+        result = await bash_tool(**tool_input)
+    except Exception as e:
+        raise ValueError(f"{e}")
+    return {'output':result.output,"error":result.error}
+
+
 
 # Run server if executed directly
 if __name__ == "__main__":

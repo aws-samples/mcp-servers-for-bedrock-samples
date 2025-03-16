@@ -39,6 +39,9 @@ async def test_vnc_controller(host, port, username, password):
     if image :
         print_success("VNC Controller captured screenshot successfully")
         
+    await vnc_controller.mouse_click(327,91,1)
+    
+        
     
         
 async def test_ssh_connection(host, port, username, password,pem_file):
