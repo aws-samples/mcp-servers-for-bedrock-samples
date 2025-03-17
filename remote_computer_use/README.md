@@ -3,11 +3,12 @@
 A Model Context Protocol (MCP) server that enables remote control of an Ubuntu desktop use [Computer Use](https://docs.anthropic.com/en/docs/agents-and-tools/computer-use)
 
 ## Features
-Currently only support `computer tool` and `bash tool`, and `text_editor too`l will be supported in future.
+Support `computer tool` and `bash tool`, and `text_editor tool` defined by Claude 3.5/3.7
 - **Mouse Control**: Move, click, and scroll
 - **Keyboard Control**: Type text and press keys
 - **Screenshot Capture**: Get visual feedback after each operation
 - **bash command** : Run bash command via ssh
+- **edit tool** : str_replace_editor
 
 ## Prerequisites
 - VNC server running on the remote Ubuntu machine

@@ -216,7 +216,7 @@ async def str_replace_editor(ctx: Context,
     
     Returns: tool results
     """
-    editor_tool = EditTool()
+    editor_tool = EditTool(ssh=ctx.request_context.lifespan_context.ssh)
     tool_input = dict(command=command, path=path,file_text=file_text, view_range=view_range, old_str=old_str, new_str=new_str, insert_line=insert_line )
     try:
         result = await editor_tool(**tool_input)
