@@ -15,6 +15,7 @@ from vnc_controller import VNCController
 from ssh_controller import SSHController
 from tools.computer import ComputerTool
 from tools.bash import BashTool
+from tools.edit import Command,EditTool
 import time
 import base64
 # from PIL import Image
@@ -140,8 +141,12 @@ async def computer(ctx: Context, action: Action,coordinate: List[int] = None,tex
          
     Returns: tool results
     """ 
+    # if use NOVA model, the image need to rescale
+    rescale = True if os.environ.get("RESCALE") in [True,1,'1'] else False
     computer_tool = ComputerTool(ssh=ctx.request_context.lifespan_context.ssh,
-                                 vnc=ctx.request_context.lifespan_context.vnc)
+                                 vnc=ctx.request_context.lifespan_context.vnc,
+                                 is_nova = rescale
+                                 )
     tool_input = dict(action=action, coordinate=coordinate, text=text)
     try:
         result = await computer_tool(**tool_input)
@@ -178,7 +183,46 @@ async def bash(ctx: Context, command: str,restart: bool = None):
         raise ValueError(f"{e}")
     return {'output':result.output,"error":result.error}
 
+@mcp.tool()
+async def str_replace_editor(ctx: Context,
+                            command: Command,
+                            path: str,
+                            file_text: str | None = None,
+                            view_range: list[int] | None = None,
+                            old_str: str | None = None,
+                            new_str: str | None = None,
+                            insert_line: int | None = None):
+    """
+    Custom editing tool for viewing, creating and editing files
+    * State is persistent across command calls and discussions with the user
+    * If `path` is a file, `view` displays the result of applying `cat -n`. If `path` is a directory, `view` lists non-hidden files and directories up to 2 levels deep
+    * The `create` command cannot be used if the specified `path` already exists as a file
+    * If a `command` generates a long output, it will be truncated and marked with `<response clipped>`
+    * The `undo_edit` command will revert the last edit made to the file at `path`
 
+    Notes for using the `str_replace` command:
+    * The `old_str` parameter should match EXACTLY one or more consecutive lines from the original file. Be mindful of whitespaces!
+    * If the `old_str` parameter is not unique in the file, the replacement will not be performed. Make sure to include enough context in `old_str` to make it unique
+    * The `new_str` parameter should contain the edited lines that should replace the `old_str`
+    
+    Args:
+        command: The commands to run. Allowed options are: `view`, `create`, `str_replace`, `insert`, `undo_edit`.
+        path: Absolute path to file or directory, e.g. `/repo/file.py` or `/repo`.
+        file_text: Required parameter of `create` command, with the content of the file to be created.
+        view_range: Optional parameter of `view` command when `path` points to a file. If none is given, the full file is shown. If provided, the file will be shown in the indicated line number range, e.g. [11, 12] will show lines 11 and 12. Indexing at 1 to start. Setting `[start_line, -1]` shows all lines from `start_line` to the end of the file.
+        old_str: Required parameter of `str_replace` command containing the string in `path` to replace.
+        new_str: Optional parameter of `str_replace` command containing the new string (if not given, no string will be added). Required parameter of `insert` command containing the string to insert.
+        insert_line: Required parameter of `insert` command. The `new_str` will be inserted AFTER the line `insert_line` of `path`.
+    
+    Returns: tool results
+    """
+    editor_tool = EditTool()
+    tool_input = dict(command=command, path=path,file_text=file_text, view_range=view_range, old_str=old_str, new_str=new_str, insert_line=insert_line )
+    try:
+        result = await editor_tool(**tool_input)
+    except Exception as e:
+        raise ValueError(f"{e}")
+    return {'output':result.output,"error":result.error}
 
 # Run server if executed directly
 if __name__ == "__main__":

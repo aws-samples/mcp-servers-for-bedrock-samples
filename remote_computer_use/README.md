@@ -30,6 +30,8 @@ Currently only support `computer tool` and `bash tool`, and `text_editor too`l w
                 "VNC_USERNAME":"ubuntu",
                 "VNC_PASSWORD":"",
                 "PEM_FILE":"",
+                "WIDTH":1024,
+                "HEIGHT":768,
                 "SSH_PORT":"22",
                 "DISPLAY_NUM":"1"
             },
