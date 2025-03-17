@@ -38,8 +38,11 @@ async def test_vnc_controller(host, port, username, password):
     image = await vnc_controller.capture_screenshot()
     if image :
         print_success("VNC Controller captured screenshot successfully")
+    else:
+        vnc_success = False
         
     await vnc_controller.mouse_click(327,91,1)
+    return vnc_success
     
         
     
@@ -69,14 +72,17 @@ async def test_ssh_connection(host, port, username, password,pem_file):
         if stderr:
             print_error(f"xdotool test failed: {stderr}")
             print_info("You may need to run 'xhost +' on the remote machine")
+            ssh_success = False
         else:
             print_success(f"xdotool test successful: {output}")
     else:
         print_error("xdotool not found. Please install it with: sudo apt install xdotool")
+        ssh_success = False
     
     await ssh_controller.disconnect()
     
     print_success("SSH connection closed")
+    return ssh_success
         
 
 
