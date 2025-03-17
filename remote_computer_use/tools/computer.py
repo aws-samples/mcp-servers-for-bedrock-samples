@@ -205,7 +205,7 @@ class ComputerTool(BaseAnthropicTool):
                     "left_click": "1",
                     "right_click": "3",
                     "middle_click": "2",
-                    "double_click": "--repeat 2 --delay 500 1",
+                    "double_click": "--repeat 2 --delay 100 1",
                 }[action]
                 return await self.shell(f"{self.xdotool} click {click_arg}")
 
