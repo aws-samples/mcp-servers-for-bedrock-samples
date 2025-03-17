@@ -68,7 +68,7 @@ chmod +x ~/.vnc/xstartup
 
 7. Starting the VNC Server
 ```bash
-tigervncserver -xstartup /usr/bin/startxfce4 -SecurityTypes VncAuth,TLSVnc -geometry 1024x768 -localhost no :1
+tigervncserver -xstartup /usr/bin/startxfce4 -SecurityTypes VncAuth,TLSVnc -geometry 1366x768 -localhost no :1
 ```
 
 8. Open (TCP : 5901) in your Securty Group of EC2 
