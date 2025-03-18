@@ -31,8 +31,8 @@ Support `computer tool` and `bash tool`, and `text_editor tool` defined by Claud
                 "VNC_USERNAME":"ubuntu",
                 "VNC_PASSWORD":"",
                 "PEM_FILE":"",
-                "WIDTH":1024,
-                "HEIGHT":768,
+                "WIDTH":"1366",
+                "HEIGHT":"768",
                 "SSH_PORT":"22",
                 "DISPLAY_NUM":"1"
             },

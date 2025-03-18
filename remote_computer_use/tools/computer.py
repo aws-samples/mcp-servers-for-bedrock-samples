@@ -230,34 +230,6 @@ class BaseComputerTool(BaseAnthropicTool):
                 return await self.shell(f"{self.xdotool} click {click_arg}")
 
         raise ToolError(f"Invalid action: {action}")
-
-    # async def screenshot(self):
-    #     """Take a screenshot of the current screen and return the base64 encoded image."""
-    #     output_dir = Path(OUTPUT_DIR)
-    #     output_dir.mkdir(parents=True, exist_ok=True)
-    #     path = output_dir / f"screenshot_{uuid4().hex}.png"
-
-    #     # Try gnome-screenshot first
-    #     if shutil.which("gnome-screenshot"):
-    #         screenshot_cmd = f"{self._display_prefix}gnome-screenshot -f {path} -p"
-    #     else:
-    #         # Fall back to scrot if gnome-screenshot isn't available
-    #         screenshot_cmd = f"{self._display_prefix}scrot -p {path}"
-
-    #     result = await self.shell(screenshot_cmd, take_screenshot=False)
-    #     if self._scaling_enabled:
-    #         x, y = self.scale_coordinates(
-    #             ScalingSource.COMPUTER, self.width, self.height
-    #         )
-    #         await self.shell(
-    #             f"convert {path} -resize {x}x{y}! {path}", take_screenshot=False
-    #         )
-
-    #     if path.exists():
-    #         return result.replace(
-    #             base64_image=base64.b64encode(path.read_bytes()).decode()
-    #         )
-    #     raise ToolError(f"Failed to take screenshot: {result.error}")
     
     async def screenshot(self):
         try:
