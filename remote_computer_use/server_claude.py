@@ -13,13 +13,13 @@ import json
 from mcp.server.fastmcp import FastMCP, Image, Context
 from vnc_controller import VNCController
 from ssh_controller import SSHController
-from tools.computer import ComputerTool
+from tools.computer import ComputerTool20250124 as ComputerTool
 from tools.bash import BashTool
 from tools.edit import Command,EditTool
 import time
 import base64
 # from PIL import Image
-from tools.computer import Action
+from tools.computer import Action,Action_20250124,ScrollDirection
 # import dotenv
 # dotenv.load_dotenv()
 
@@ -110,7 +110,14 @@ def base64_to_pil(base64_str):
 
 
 @mcp.tool()
-async def computer(ctx: Context, action: Action,coordinate: List[int] = None,text:str = None):
+async def computer( ctx: Context,
+                    action: Action_20250124,
+                    coordinate: List[int] = None,
+                    duration: int | float | None = None,
+                    scroll_direction: ScrollDirection | None = None,
+                    scroll_amount: int | None = None,
+                    text:str = None,
+                   ):
     """Use a mouse and keyboard to interact with a computer, and take screenshots.
     - This is an interface to a desktop GUI. You do not have access to a terminal or applications menu. You must click on desktop icons to start applications.
     - Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions. E.g. if you click on Firefox and a window doesn't open, try taking another screenshot.
@@ -124,20 +131,31 @@ async def computer(ctx: Context, action: Action,coordinate: List[int] = None,tex
     
     Args: 
         action: The action to perform. The available actions are:
-                * `key`: Press a key or key-combination on the keyboard.
-                  - This supports xdotool's `key` syntax.
-                  - Examples: "a", "Return", "alt+Tab", "ctrl+s", "Up", "KP_0" (for the numpad 0 key).
-                * `type`: Type a string of text on the keyboard.
-                * `cursor_position`: Get the current (x, y) pixel coordinate of the cursor on the screen.
-                * `mouse_move`: Move the cursor to a specified (x, y) pixel coordinate on the screen.
-                * `left_click`: Click the left mouse button.
-                * `left_click_drag`: Click and drag the cursor to a specified (x, y) pixel coordinate on the screen.
-                * `right_click`: Click the right mouse button.
-                * `middle_click`: Click the middle mouse button.
-                * `double_click`: Double-click the left mouse button.
-                * `screenshot`: Take a screenshot of the screen.
-        coordinate: [x, y]: This represents the center of the object. The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=mouse_move` and `action=left_click_drag`.
-        text: Required only by `action=type` and `action=key`.
+            * `key`: Press a key or key-combination on the keyboard.
+              - This supports xdotool's `key` syntax.
+            '  - Examples: "a", "Return", "alt+Tab", "ctrl+s", "Up", "KP_0" (for the numpad 0 key).'
+            * `hold_key`: Hold down a key or multiple keys for a specified duration (in seconds). Supports the same syntax as `key`.
+            * `type`: Type a string of text on the keyboard.
+            * `cursor_position`: Get the current (x, y) pixel coordinate of the cursor on the screen.
+            * `mouse_move`: Move the cursor to a specified (x, y) pixel coordinate on the screen.
+            * `left_mouse_down`: Press the left mouse button.
+            * `left_mouse_up`: Release the left mouse button.
+            * `left_click`: Click the left mouse button at the specified (x, y) pixel coordinate on the screen. You can also include a key combination to hold down while clicking using the `text` parameter.
+            * `left_click_drag`: Click and drag the cursor from `start_coordinate` to a specified (x, y) pixel coordinate on the screen.
+            * `right_click`: Click the right mouse button at the specified (x, y) pixel coordinate on the screen.
+            * `middle_click`: Click the middle mouse button at the specified (x, y) pixel coordinate on the screen.
+            * `double_click`: Double-click the left mouse button at the specified (x, y) pixel coordinate on the screen.
+            * `triple_click`: Triple-click the left mouse button at the specified (x, y) pixel coordinate on the screen.
+            * `scroll`: Scroll the screen in a specified direction by a specified amount of clicks of the scroll wheel, at the specified (x, y) pixel coordinate. DO NOT use PageUp/PageDown to scroll.
+            * `wait`: Wait for a specified duration (in seconds).
+            * `screenshot`: Take a screenshot of the screen.
+        coordinate: (x, y): This represents the center of the object. The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=mouse_move` and `action=left_click_drag`.
+        duration: The duration to hold the key down for. Required only by `action=hold_key` and `action=wait`
+        scroll_amount: The number of 'clicks' to scroll. Required only by `action=scroll`.
+        scroll_direction: The direction to scroll the screen. Required only by `action=scroll`.
+        start_coordinate: (x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to start the drag from. Required only by `action=left_click_drag`.
+        text: Required only by `action=type`, `action=key`, and `action=hold_key`. Can also be used by click or scroll actions to hold down keys while clicking or scrolling.
+        
          
     Returns: tool results
     """ 
@@ -147,7 +165,7 @@ async def computer(ctx: Context, action: Action,coordinate: List[int] = None,tex
                                  vnc=ctx.request_context.lifespan_context.vnc,
                                  is_nova = rescale
                                  )
-    tool_input = dict(action=action, coordinate=coordinate, text=text)
+    tool_input = dict(action=action, coordinate=coordinate, text=text,duration=duration,scroll_direction=scroll_direction,scroll_amount=scroll_amount)
     try:
         result = await computer_tool(**tool_input)
     except Exception as e:
