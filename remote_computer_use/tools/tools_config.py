@@ -13,45 +13,75 @@ computer_tool_description = """Use a mouse and keyboard to interact with a compu
 computer_tool_input_schema = {
     "properties": {
         "action": {
-            "description": """The action to perform. The available actions are:
-                * `key`: Press a key or key-combination on the keyboard.
-                  - This supports xdotool's `key` syntax.
-                  - Examples: "a", "Return", "alt+Tab", "ctrl+s", "Up", "KP_0" (for the numpad 0 key).
-                * `type`: Type a string of text on the keyboard.
-                * `cursor_position`: Get the current (x, y) pixel coordinate of the cursor on the screen.
-                * `mouse_move`: Move the cursor to a specified (x, y) pixel coordinate on the screen.
-                * `left_click`: Click the left mouse button.
-                * `left_click_drag`: Click and drag the cursor to a specified (x, y) pixel coordinate on the screen.
-                * `right_click`: Click the right mouse button.
-                * `middle_click`: Click the middle mouse button.
-                * `double_click`: Double-click the left mouse button.
-                * `screenshot`: Take a screenshot of the screen.""",
+            "description": "The action to perform. The available actions are:\n"
+            "* `key`: Press a key or key-combination on the keyboard.\n"
+            "  - This supports xdotool's `key` syntax.\n"
+            '  - Examples: "a", "Return", "alt+Tab", "ctrl+s", "Up", "KP_0" (for the numpad 0 key).\n'
+            "* `hold_key`: Hold down a key or multiple keys for a specified duration (in seconds). Supports the same syntax as `key`.\n"
+            "* `type`: Type a string of text on the keyboard.\n"
+            "* `cursor_position`: Get the current (x, y) pixel coordinate of the cursor on the screen.\n"
+            "* `mouse_move`: Move the cursor to a specified (x, y) pixel coordinate on the screen.\n"
+            "* `left_mouse_down`: Press the left mouse button.\n"
+            "* `left_mouse_up`: Release the left mouse button.\n"
+            "* `left_click`: Click the left mouse button at the specified (x, y) pixel coordinate on the screen. You can also include a key combination to hold down while clicking using the `text` parameter.\n"
+            "* `left_click_drag`: Click and drag the cursor from `start_coordinate` to a specified (x, y) pixel coordinate on the screen.\n"
+            "* `right_click`: Click the right mouse button at the specified (x, y) pixel coordinate on the screen.\n"
+            "* `middle_click`: Click the middle mouse button at the specified (x, y) pixel coordinate on the screen.\n"
+            "* `double_click`: Double-click the left mouse button at the specified (x, y) pixel coordinate on the screen.\n"
+            "* `triple_click`: Triple-click the left mouse button at the specified (x, y) pixel coordinate on the screen.\n"
+            "* `scroll`: Scroll the screen in a specified direction by a specified amount of clicks of the scroll wheel, at the specified (x, y) pixel coordinate. DO NOT use PageUp/PageDown to scroll.\n"
+            "* `wait`: Wait for a specified duration (in seconds).\n"
+            "* `screenshot`: Take a screenshot of the screen.",
             "enum": [
                 "key",
+                "hold_key",
                 "type",
+                "cursor_position",
                 "mouse_move",
+                "left_mouse_down",
+                "left_mouse_up",
                 "left_click",
                 "left_click_drag",
                 "right_click",
                 "middle_click",
                 "double_click",
+                "triple_click",
+                "scroll",
+                "wait",
                 "screenshot",
-                "cursor_position",
             ],
             "type": "string",
         },
         "coordinate": {
-            "description": "(x, y): This represents the center of the object. The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=mouse_move` and `action=left_click_drag`.",
+            "description": "(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=mouse_move` and `action=left_click_drag`.",
+            "type": "array",
+        },
+        "duration": {
+            "description": "The duration to hold the key down for. Required only by `action=hold_key` and `action=wait`.",
+            "type": "integer",
+        },
+        "scroll_amount": {
+            "description": "The number of 'clicks' to scroll. Required only by `action=scroll`.",
+            "type": "integer",
+        },
+        "scroll_direction": {
+            "description": "The direction to scroll the screen. Required only by `action=scroll`.",
+            "enum": ["up", "down", "left", "right"],
+            "type": "string",
+        },
+        "start_coordinate": {
+            "description": "(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to start the drag from. Required only by `action=left_click_drag`.",
             "type": "array",
         },
         "text": {
-            "description": "Required only by `action=type` and `action=key`.",
+            "description": "Required only by `action=type`, `action=key`, and `action=hold_key`. Can also be used by click or scroll actions to hold down keys while clicking or scrolling.",
             "type": "string",
         },
     },
     "required": ["action"],
     "type": "object",
 }
+
 
 
 
