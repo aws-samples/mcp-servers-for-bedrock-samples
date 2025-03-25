@@ -5,3 +5,6 @@
 
 ### 2. OpenAPI MCP Server
 一个 mcp server，可以直接支持任意openai格式的api， 相当于直接配上接口描述就能变成一个自定义的mcp server. [openapi-mcp-server](https://github.com/snaggle-ai/openapi-mcp-server#)
+
+### 3. Deepseek planner
+使用Bedrock上DeepSeek R1做planning, coding。 [deepseek-planner](deepseek-planner/README.md)
