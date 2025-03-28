@@ -20,8 +20,12 @@ import time
 import base64
 # from PIL import Image
 from tools.computer import Action,Action_20250124,ScrollDirection
+import functools
 # import dotenv
 # dotenv.load_dotenv()
+
+
+
 
 # Create dataclass for app context
 @dataclass
@@ -51,7 +55,6 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     pem_file = os.environ.get("PEM_FILE", "")
     ssh_port = int(os.environ.get("SSH_PORT", "22"))
     display_num = os.environ.get("DISPLAY_NUM", "1")
-
     
     # Validate required environment variables
     if not vnc_host:
@@ -90,6 +93,21 @@ mcp = FastMCP(
 )
 
 
+def update_docstring_with_display_info(func):
+    """更新函数的docstring，替换屏幕分辨率占位符"""
+    display_width_px = os.environ.get("WIDTH", "1024")
+    display_height_px = os.environ.get("HEIGHT", "768")
+    display_num = os.environ.get("DISPLAY_NUM", "1")
+    
+    if func.__doc__:
+        func.__doc__ = func.__doc__.format(
+            display_width_px=display_width_px,
+            display_height_px=display_height_px,
+            display_num=display_num
+        )
+    return func
+
+
 def base64_to_pil(base64_str):
     """
     Convert a base64 string to a PIL Image object
@@ -108,8 +126,35 @@ def base64_to_pil(base64_str):
     img = Image(data=img_data, format="png")
     return img
 
+@mcp.tool()
+@update_docstring_with_display_info
+async def capture_region(ctx: Context,x: int, y: int, w: int, h: int) -> Image:
+    """
+    Capture screenshot only represents of a region of the remote desktop
+    - The screen's resolution is {display_width_px}x{display_height_px}.
+    - The display number is {display_num}
+    
+    Args:
+        x: X coordinate (pixels from the left edge)
+        y: Y coordinate (pixels from the top edge)
+        w: Width of the region
+        h: Hight of the region
+        
+    Returns:
+        Image: Screenshot of the remote desktop
+    """
+    vnc = ctx.request_context.lifespan_context.vnc
+    screenshot = await vnc.capture_region(x,y,w,h)
+    
+    # Convert PIL Image to bytes
+    img_bytes = io.BytesIO()
+    screenshot.save(img_bytes, format="PNG")
+    
+    return Image(data=img_bytes.getvalue(), format="png")
+
 
 @mcp.tool()
+@update_docstring_with_display_info
 async def computer( ctx: Context,
                     action: Action_20250124,
                     coordinate: List[int] = None,
@@ -118,21 +163,21 @@ async def computer( ctx: Context,
                     scroll_amount: int | None = None,
                     text:str = None,
                    ):
-    """Use a mouse and keyboard to interact with a computer, and take screenshots.
-    - This is an interface to a desktop GUI. You do not have access to a terminal or applications menu. You must click on desktop icons to start applications.
+    """
+    Use a mouse and keyboard to interact with a computer, and take screenshots.
+    - This is an interface to a desktop GUI with Linux OS. You do not have access to a terminal or applications menu. You must click on desktop icons to start applications.
     - Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions. E.g. if you click on Firefox and a window doesn't open, try taking another screenshot.
     - The screen's resolution is {display_width_px}x{display_height_px}.
-    - The display number is {display_number}
+    - The display number is {display_num}
     - Whenever you intend to move the cursor to click on an element like an icon, you should consult a screenshot to determine the coordinates of the element before moving the cursor.
     - If you tried clicking on a program or link but it failed to load, even after waiting, try adjusting your cursor position so that the tip of the cursor visually falls on the element that you want to click.
     - Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.
     - When you do `left_click` or `type` action, please make sure you do `mouse_move` to correct coordinates first.
-
     
     Args: 
         action: The action to perform. The available actions are:
             * `key`: Press a key or key-combination on the keyboard.
-              - This supports xdotool's `key` syntax.
+            - This supports xdotool's `key` syntax.
             '  - Examples: "a", "Return", "alt+Tab", "ctrl+s", "Up", "KP_0" (for the numpad 0 key).'
             * `hold_key`: Hold down a key or multiple keys for a specified duration (in seconds). Supports the same syntax as `key`.
             * `type`: Type a string of text on the keyboard.
@@ -156,9 +201,9 @@ async def computer( ctx: Context,
         start_coordinate: (x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to start the drag from. Required only by `action=left_click_drag`.
         text: Required only by `action=type`, `action=key`, and `action=hold_key`. Can also be used by click or scroll actions to hold down keys while clicking or scrolling.
         
-         
     Returns: tool results
-    """ 
+    """
+
     # if use NOVA model, the image need to rescale
     rescale = True if os.environ.get("RESCALE") in [True,1,'1'] else False
     computer_tool = ComputerTool(ssh=ctx.request_context.lifespan_context.ssh,
