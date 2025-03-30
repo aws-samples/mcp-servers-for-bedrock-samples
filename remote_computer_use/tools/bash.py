@@ -91,7 +91,7 @@ class BashTool(BaseAnthropicTool):
 
     _session: _BashSession | None
     name: ClassVar[Literal["bash"]] = "bash"
-    api_type: ClassVar[Literal["bash_20241022"]] = "bash_20241022"
+    api_type: ClassVar[Literal["bash_20250124"]] = "bash_20250124"
     ssh = None
     
     def __init__(self,ssh):
