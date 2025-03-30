@@ -126,31 +126,31 @@ def base64_to_pil(base64_str):
     img = Image(data=img_data, format="png")
     return img
 
-@mcp.tool()
-@update_docstring_with_display_info
-async def capture_region(ctx: Context,x: int, y: int, w: int, h: int) -> Image:
-    """
-    Capture screenshot only represents of a region of the remote desktop
-    - The screen's resolution is {display_width_px}x{display_height_px}.
-    - The display number is {display_num}
+# @mcp.tool()
+# @update_docstring_with_display_info
+# async def capture_region(ctx: Context,x: int, y: int, w: int, h: int) -> Image:
+#     """
+#     Capture screenshot only represents of a region of the remote desktop
+#     - The screen's resolution is {display_width_px}x{display_height_px}.
+#     - The display number is {display_num}
     
-    Args:
-        x: X coordinate (pixels from the left edge)
-        y: Y coordinate (pixels from the top edge)
-        w: Width of the region
-        h: Hight of the region
+#     Args:
+#         x: X coordinate (pixels from the left edge)
+#         y: Y coordinate (pixels from the top edge)
+#         w: Width of the region
+#         h: Hight of the region
         
-    Returns:
-        Image: Screenshot of the remote desktop
-    """
-    vnc = ctx.request_context.lifespan_context.vnc
-    screenshot = await vnc.capture_region(x,y,w,h)
+#     Returns:
+#         Image: Screenshot of the remote desktop
+#     """
+#     vnc = ctx.request_context.lifespan_context.vnc
+#     screenshot = await vnc.capture_region(x,y,w,h)
     
-    # Convert PIL Image to bytes
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format="PNG")
+#     # Convert PIL Image to bytes
+#     img_bytes = io.BytesIO()
+#     screenshot.save(img_bytes, format="PNG")
     
-    return Image(data=img_bytes.getvalue(), format="png")
+#     return Image(data=img_bytes.getvalue(), format="png")
 
 
 @mcp.tool()
