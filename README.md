@@ -1,4 +1,4 @@
-## Sample MCP Servers
+## Sample MCP Servers for Bedrock
 
 ### 1. Computer Use
 使用MCP连接远程EC2服务器作为computer use sandbox使用 [README](remote_computer_use/README.md)

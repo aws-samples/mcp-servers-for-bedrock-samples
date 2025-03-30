@@ -1,3 +1,0 @@
-[submodule "openapi-mcp-server"]
-	path = openapi-mcp-server
-	url = https://github.com/snaggle-ai/openapi-mcp-server.git
