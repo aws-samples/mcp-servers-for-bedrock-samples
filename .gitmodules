@@ -1,0 +1,6 @@
+[submodule "openapi-mcp-server"]
+	path = openapi-mcp-server
+	url = https://github.com/janwilmake/openapi-mcp-server.git
+[submodule "mcp-server-aws"]
+	path = mcp-server-aws
+	url = https://github.com/rishikavikondala/mcp-server-aws.git
