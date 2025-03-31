@@ -1,13 +1,10 @@
-## Sample MCP Servers for Bedrock
+## AWS MCP Servers Samples
 
 ### 1. Computer Use
 使用MCP连接远程EC2服务器作为computer use sandbox使用 [README](remote_computer_use/README.md)
 
-### 2. OpenAPI MCP Server
-一个 mcp server，可以直接支持任意openai格式的api， 相当于直接配上接口描述就能变成一个自定义的mcp server. [openapi-mcp-server](https://github.com/snaggle-ai/openapi-mcp-server#)
-
-### 3. Deepseek planner
+### 2. Deepseek planner
 使用Bedrock上DeepSeek R1做planning, coding。 [deepseek-planner](deepseek-planner/README.md)
 
-### 4. Dify worflow mcp server demo
+### 3. Dify worflow mcp server demo
 使用Python MCP SDK 集成 Dify workflow mcp server。 [dify_mcp_servers](dify_mcp_servers/README.md)
