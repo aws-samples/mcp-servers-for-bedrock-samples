@@ -8,3 +8,6 @@
 
 ### 3. Deepseek planner
 使用Bedrock上DeepSeek R1做planning, coding。 [deepseek-planner](deepseek-planner/README.md)
+
+### 4. Dify worflow mcp server demo
+使用Python MCP SDK 集成 Dify workflow mcp server。 [dify_mcp_servers](dify_mcp_servers/README.md)
