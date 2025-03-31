@@ -1,0 +1,8 @@
+curl -X POST 'https://api.dify.ai/v1/workflows/run' \
+--header 'Authorization: Bearer api-key' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "inputs": {"ad_data": "你好，请介绍一下自己"},
+    "response_mode": "streaming",
+    "user": "abc-123"
+}'
