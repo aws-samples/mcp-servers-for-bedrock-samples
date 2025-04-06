@@ -205,7 +205,7 @@ async def computer( ctx: Context,
     """
 
     # if use NOVA model, the image need to rescale
-    rescale = True if os.environ.get("RESCALE") in [True,1,'1'] else False
+    rescale = True if os.environ.get("NOVA") in [True,1,'1'] else False
     computer_tool = ComputerTool(ssh=ctx.request_context.lifespan_context.ssh,
                                  vnc=ctx.request_context.lifespan_context.vnc,
                                  is_nova = rescale
