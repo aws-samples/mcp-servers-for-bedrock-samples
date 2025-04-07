@@ -27,30 +27,9 @@ An MCP (Model Context Protocol) server that provides planning and coding assista
 
 ## Usage
 
-### Running the server
+### Setup
 
-```
-python src/server.py
-```
-
-### Environment Variables
-
-The server requires the following environment variables:
-
-```
-AWS_ACCESS_KEY_ID=your_access_key_id
-AWS_SECRET_ACCESS_KEY=your_secret_access_key
-AWS_REGION=us-east-1  # Optional, defaults to us-east-1
-AWS_SESSION_TOKEN=your_session_token  # Optional, only needed for temporary credentials
-```
-
-### Using with Claude Desktop
-
-1. Open your Claude Desktop configuration file:
-   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-
-2. Add the DeepSeek Planner server configuration:
+1. Add the DeepSeek Planner server configuration:
    ```json
    {
      "mcpServers": {
@@ -71,8 +50,6 @@ AWS_SESSION_TOKEN=your_session_token  # Optional, only needed for temporary cred
      }
    }
    ```
-
-3. Restart Claude Desktop
 
 ### Available Tools
 
