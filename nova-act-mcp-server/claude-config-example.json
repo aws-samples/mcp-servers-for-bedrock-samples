@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "nova-act": {
+      "command": "python",
+      "args": ["-m", "nova_act_mcp_server"],
+      "env": {
+        "NOVA_ACT_API_KEY": "your-nova-act-api-key-here"
+      }
+    }
+  }
+}

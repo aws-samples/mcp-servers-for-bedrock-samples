@@ -1,0 +1,10 @@
+[project]
+name = "nova-act-mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.6.0",
+    "nova-act>=1.0.2235.0",
+]
