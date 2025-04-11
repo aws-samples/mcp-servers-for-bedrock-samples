@@ -28,7 +28,6 @@ An MCP (Model Context Protocol) server that provides planning and coding assista
 ## Usage
 
 ### Setup
-
 1. Add the DeepSeek Planner server configuration:
    ```json
    {
