@@ -18,4 +18,3 @@ https://github.com/aws-samples/demo_mcp_on_amazon_bedrock
 1. [AWS MCP Server](https://github.com/rishikavikondala/mcp-server-aws.git)
 
 2. [OpenAPI MCP Server](https://github.com/janwilmake/openapi-mcp-server.git) 只要有restful api，就转成MCP server的方案 
-
