@@ -43,7 +43,12 @@ docker-compose up -d
 }
 ```
 
-4. Stop container
+### Other commands
+1. Stop container
 ```bash
 docker-compose down
+```
+2. View logs of container
+```bash
+docker-compose logs -f
 ```
