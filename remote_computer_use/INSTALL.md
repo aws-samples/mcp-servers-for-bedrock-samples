@@ -108,6 +108,35 @@ This will verify that:
 
 If any tests fail, check the error messages and troubleshoot accordingly.
 
+
 This will start the MCP Inspector interface where you can test the server's tools.
 
 
+###  Add below json to your client to install MCP Server,
+this `server_claude.py` works better for Claude 3.5/3.7, if you want to use other models, please change the run command to run `server.py` instead.
+```json
+{
+    "mcpServers": {
+        "computer_use": {
+            "command": "uv",
+            "env": {
+                "VNC_HOST":"",
+                "VNC_PORT":"5901",
+                "VNC_USERNAME":"ubuntu",
+                "VNC_PASSWORD":"",
+                "PEM_FILE":"",
+                "WIDTH":"1024",
+                "HEIGHT":"768",
+                "SSH_PORT":"22",
+                "DISPLAY_NUM":"1"
+            },
+            "args": [
+                "--directory",
+                "/absolute_path_to/remote_computer_use",
+                "run",
+                "server_claude.py"
+            ]
+        }
+    }
+}
+```
