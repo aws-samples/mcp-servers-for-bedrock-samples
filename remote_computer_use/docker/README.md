@@ -13,7 +13,7 @@ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 docker-compose up -d
 ```
 
-3. Add mcp server  
+###  Add below json to your client to install MCP Server,
 - Change the path to the remote_computer_use/server_claude.py. 
 - If you run the VNC container in a seperate EC2, please change VNC_HOST to the actual ip address.
 ```json

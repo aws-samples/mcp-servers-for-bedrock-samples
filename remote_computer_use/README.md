@@ -16,38 +16,15 @@ Support `computer tool` and `bash tool`, and `text_editor tool` defined by Claud
 - SSH access to the remote Ubuntu machine
 
 ## Installation
-1. Prepare Remote Desktop
+### (New) Recommend Option 1
+1. Build and run a ubuntu 24.04 sandbox in docker container  
+[INSTALL Docker](docker/README.md)
+
+### Option 2
+1. Install Remote Desktop in standalone EC2 instance
 [INSTALL](./INSTALL.md)
 
-2. Add below json to your client to install MCP Server, this `server_claude.py` works better for Claude 3.5/3.7, if you want to use other models, please change the run command to run `server.py` instead.
-```json
-{
-    "mcpServers": {
-        "computer_use": {
-            "command": "uv",
-            "env": {
-                "VNC_HOST":"",
-                "VNC_PORT":"5901",
-                "VNC_USERNAME":"ubuntu",
-                "VNC_PASSWORD":"",
-                "PEM_FILE":"",
-                "WIDTH":"1024",
-                "HEIGHT":"768",
-                "SSH_PORT":"22",
-                "DISPLAY_NUM":"1"
-            },
-            "args": [
-                "--directory",
-                "/absolute_path_to/remote_computer_use",
-                "run",
-                "server_claude.py"
-            ]
-        }
-    }
-}
-```
-
-3. Add system prompt to your client when use computer_use
+## Add system prompt to your client when use computer_use
 ```
 You are a computer agent, you can actually operate a vitural computer. 
 you have capability:
