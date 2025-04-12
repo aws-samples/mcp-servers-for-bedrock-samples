@@ -50,6 +50,8 @@ async def test_vnc_controller(host, port, username, password):
 async def test_ssh_connection(host, port, username, password,pem_file):
     """Test SSH connection and xdotool availability"""
     print_info(f"Testing SSH connection to {host}:{port}...")
+    if pem_file:
+        print_info(f"Using private key: {pem_file}")
     ssh_controller = SSHController(host, port, username, password, pem_file)
     ssh_success = await ssh_controller.connect()
     if not ssh_success:
@@ -107,7 +109,7 @@ async def main():
     vnc_username = os.environ.get("VNC_USERNAME")
     vnc_password = os.environ.get("VNC_PASSWORD")
     ssh_port = int(os.environ.get("SSH_PORT", "22"))
-    pem_file = os.environ.get("PEM_FILE", "")
+    pem_file = os.environ.get("PEM_FILE", None)
     
     # Validate required environment variables
     if not vnc_host:

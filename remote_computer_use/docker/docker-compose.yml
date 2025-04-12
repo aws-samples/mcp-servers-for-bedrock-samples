@@ -1,0 +1,17 @@
+services:
+  ubuntu-vnc:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: ubuntu-vnc:24.04
+    container_name: ubuntu-vnc-desktop
+    ports:
+      - "5901:5901"
+      - "2222:22"  # 将容器的22端口映射到主机的2222端口
+    restart: unless-stopped
+    volumes:
+      - ./data:/home/vnc_user/data
+    environment:
+      - VNC_RESOLUTION=1024x768
+      - VNC_PASSWORD=12345670  # 自定义VNC密码
+      - SSH_PASSWORD=12345670   # 自定义SSH密码
