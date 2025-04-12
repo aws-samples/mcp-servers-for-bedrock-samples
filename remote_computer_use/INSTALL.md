@@ -108,22 +108,6 @@ This will verify that:
 
 If any tests fail, check the error messages and troubleshoot accordingly.
 
-## Development Mode
-
-To run the server in development mode with the MCP Inspector:  
-- creat a python environment
-```bash
-uv sync
-```
-
-```bash
-# Activate the virtual environment (if not already activated)
-source .venv/bin/activate
-
-# Run in development mode
-mcp dev server.py
-```
-
 This will start the MCP Inspector interface where you can test the server's tools.
 
 

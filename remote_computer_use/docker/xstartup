@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# 设置环境变量
+export XDG_RUNTIME_DIR=/tmp/runtime-vnc_user
+
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+
+# 启动dbus
+/etc/init.d/dbus start
+
+# 初始化Xfce会话
+exec startxfce4
