@@ -1,0 +1,13 @@
+services:
+  flask-web-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flask-web-service:latest
+    container_name: flask-web-service
+    ports:
+      - "5006:5006"
+    volumes:
+      - ./data:/app/data
+      - ./files:/app/files
+    restart: unless-stopped
