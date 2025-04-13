@@ -8,7 +8,7 @@
 | 2 | Dify worflow mcp server demo | 使用Python MCP SDK 实现 Dify workflow mcp serverr | lht@ | [Dify worflow mcp server demo](https://github.com/aws-samples/aws-mcp-servers-samples/blob/main/dify_mcp_servers/README.md) |
 | 3 | Deepseek planner | 使用Bedrock上DeepSeek R1做planning, coding | chuanxie@ | [deepseek-planner](deepseek-planner/README.md) |
 | 4 | Time Server | 让Agent知道当前实际时间 | chuanxie@ | [time-server](time_server/README.md) |
-
+| 5 | Html Render Service | 把Markdown文件或者HTML转成网页渲染出来 | chuanxie@ | [Html-Render-Service](html_render_service/README.md) |
 
 ## Demo MCP on Amazon Bedrock 
 推荐Bedrock MCP Demo：
