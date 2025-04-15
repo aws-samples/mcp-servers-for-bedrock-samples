@@ -8,6 +8,7 @@ MCP server 用于将Agent生成的html或者markdown内容渲染成Web Page，�
 1. 启动服务:
 
 ```bash
+cd aws-mcp-servers-samples/html_render_service/web
 docker-compose up -d
 ```
 
