@@ -45,7 +45,7 @@ mcp = FastMCP(
     app_lifespan=app_lifespan,
     dependencies=['requests'])
 
-# @mcp.tool()
+@mcp.tool()
 async def render_markdown(file_name:str, markdown_content: str) -> str:
     """
     Converts markdown content to HTML and uploads it to a server.
