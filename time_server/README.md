@@ -6,7 +6,7 @@ git clone repo到本地或者服务器上:
 {"mcpServers": 
 	{ "time": 
 		{ "command": "uv", 
-		"args": ["--directory","/path/to/timer_server/src",
+		"args": ["--directory","/path/to/time_server/src",
 		"run",
 			"server.py"]
 		 } 
