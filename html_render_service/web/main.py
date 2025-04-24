@@ -32,11 +32,15 @@ def get_public_ip():
         return response.strip()
     except:
         return None
+    
+host_ip = get_public_ip()
+
 
 @app.route('/upload_html',methods=['POST'])
 def upload_html():
-    host_ip = get_public_ip()
-    
+    # host_ip = get_public_ip()
+    file_suffix = str(uuid.uuid4())[:8]
+
     # Check if the request contains JSON with file_name and file_content
     if request.is_json:
         json_data = request.get_json()
@@ -74,8 +78,10 @@ def upload_html():
             return jsonify({"error": "Invalid input"}), 400
             
         # Use a timestamp as filename since no original filename is available
-        filename = f"html_content_{int(time.time_ns())}"
+        filename = f"html_content"
     
+    filename = f"{filename}_{file_suffix}"
+
     # Save the HTML content directly without modifications
     with open(os.path.join(OUTPUT_FOLDER, f"{filename}.html"), "w+", encoding='utf-8') as f:
         f.write(content)
@@ -86,8 +92,8 @@ def upload_html():
     
 @app.route('/upload_markdown', methods=['POST'])
 def upload_markdown():
-    host_ip = get_public_ip()
     
+    file_suffix = str(uuid.uuid4())[:8]
     # Check if the request contains JSON with file_name and file_content
     if request.is_json:
         json_data = request.get_json()
@@ -139,6 +145,7 @@ def upload_markdown():
 </body>
 </html>
 """ 
+    filename = f"{filename}_{file_suffix}"
     with open(os.path.join(OUTPUT_FOLDER, f"{filename}.html"),
               "w+",
               encoding='utf-8') as f:  # create final file
