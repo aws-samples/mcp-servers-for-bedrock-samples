@@ -1,0 +1,14 @@
+[project]
+name = "streamble-mcp-server-demo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115.12",
+    "fastmcp>=2.3.0",
+    "flask>=3.1.0",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
+    "requests-oauthlib>=2.0.0",
+]
