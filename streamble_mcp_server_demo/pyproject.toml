@@ -1,7 +1,7 @@
 [project]
 name = "streamble-mcp-server-demo"
 version = "0.1.0"
-description = "Add your description here"
+description = "Streamable MCP server with AWS Cognito authentication"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,4 +11,5 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
     "requests-oauthlib>=2.0.0",
+    "pyjwt>=2.8.0",
 ]
