@@ -48,11 +48,11 @@ mcp = FastMCP(
 @mcp.tool()
 async def render_markdown(file_name:str, markdown_content: str) -> str:
     """
-    Converts markdown content to HTML and uploads it to a server.
+    uploads markdown it to a server.
     
     Args:
         file_name: Name of the markdown file to be rendered
-        markdown_content: Markdown content to be converted to HTML
+        markdown_content: Markdown content to be rendered
         
     Returns:
         URL string to access the rendered HTML page
@@ -71,7 +71,7 @@ async def render_html(file_name:str, html_content: str) -> str:
     
     Args:
         file_name: Name of the HTML file to be rendered
-        html_content: HTML content
+        html_content: HTML content  to be rendered
         
     Returns:
         URL string to access the rendered HTML page
