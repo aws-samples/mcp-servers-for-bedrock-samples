@@ -17,8 +17,9 @@ This project provides a simple MCP server for managing AWS GameLift fleets and c
   - mcp.server.fastmcp (custom or third-party)
 
 ## Environment Variables
-- `AWS_ACCESS_KEY_ID`: Your AWS access key
-- `AWS_SECRET_ACCESS_KEY`: Your AWS secret key
+- `AWS_PROFILE`: Your AWS profile name (optional, if not set, will use AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+- `AWS_ACCESS_KEY_ID`: Your AWS access key (required if AWS_PROFILE is not set)
+- `AWS_SECRET_ACCESS_KEY`: Your AWS secret key (required if AWS_PROFILE is not set)
 
 ## How to Run
 1. Install dependencies:
@@ -26,8 +27,12 @@ This project provides a simple MCP server for managing AWS GameLift fleets and c
    pip install boto3 httpx
    # Install mcp.server.fastmcp as required
    ```
-2. Set AWS credentials in your environment:
+2. Set AWS credentials in your environment (choose one method):
    ```bash
+   # Method 1: Using AWS Profile
+   export AWS_PROFILE=your_profile_name
+   
+   # Method 2: Using Access Keys
    export AWS_ACCESS_KEY_ID=your_access_key
    export AWS_SECRET_ACCESS_KEY=your_secret_key
    ```
@@ -37,11 +42,14 @@ This project provides a simple MCP server for managing AWS GameLift fleets and c
    ```
 
 ## API Endpoints (Tools)
-- `echo(message: str) -> str`: Returns a test echo message.
 - `get_game_lift_fleets(region: str = 'us-east-1') -> str`: List all GameLift fleets in the specified region.
 - `get_gamelift_container_fleets(region: str = 'us-east-1') -> str`: List all GameLift container fleets in the specified region.
 - `get_fleet_attributes(fleet_id: str, region: str = 'us-east-1') -> str`: Get attributes for a specific GameLift fleet.
 - `get_container_fleet_attributes(fleet_id: str, region: str = 'us-east-1') -> str`: Get attributes for a specific GameLift container fleet.
+- `get_compute_auth_token(fleet_id: str, region: str = 'us-east-1', compute_name: str = '') -> str`: Get compute auth token for an ANYWHERE fleet.
+- `get_vpc_peering_connections(fleet_id: str, region: str = 'us-east-1') -> str`: Get VPC peering connections for a specific fleet.
+- `get_builds(region: str = 'us-east-1') -> str`: List all GameLift builds in the specified region.
+- `get_fleet_capacity(fleet_id_list: List[str], region: str = 'us-east-1') -> str`: Get capacity information for a list of fleets (not supported for ANYWHERE fleets).
 
 ## Config Mcp Server
 ```
