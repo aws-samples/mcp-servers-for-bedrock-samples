@@ -3,6 +3,7 @@ import httpx
 import boto3
 import os
 import logging
+from typing import List
 
 # create MCP server instance
 mcp = FastMCP("gamelift_mcp_server")
@@ -11,12 +12,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("gamelift_mcp_server")
 
 # define a tool function, expose to client
-@mcp.tool()
-async def echo(message: str) -> str:
-    return f"Echo from MCP server: {message}"
+# @mcp.tool()
+# async def echo(message: str) -> str:
+#     return f"Echo from MCP server: {message}"
 
 @mcp.tool()
-async def get_game_lift_fleets(region: str = 'us-east-1') -> str:
+async def get_game_lift_fleets(region: str = os.environ.get("AWS_REGION")) -> str:
     """Get gamelift fleet list in specific region
     
     Args:
@@ -53,7 +54,7 @@ async def get_game_lift_fleets(region: str = 'us-east-1') -> str:
     return fleet_details
 
 @mcp.tool()
-async def get_gamelift_container_fleets(region: str = 'us-east-1') -> str:
+async def get_gamelift_container_fleets(region: str = os.environ.get("AWS_REGION")) -> str:
     """Get gamelift container fleet list in specific region
     
     Args:
@@ -68,7 +69,7 @@ async def get_gamelift_container_fleets(region: str = 'us-east-1') -> str:
 
 
 @mcp.tool()
-async def get_fleet_attributes(fleet_id: str, region: str = 'us-east-1') -> str:
+async def get_fleet_attributes(fleet_id: str, region: str = os.environ.get("AWS_REGION")) -> str:
     """Get fleet attributes by fleet id
     
     Args:
@@ -83,7 +84,7 @@ async def get_fleet_attributes(fleet_id: str, region: str = 'us-east-1') -> str:
 
 
 @mcp.tool()
-async def get_container_fleet_attributes(fleet_id: str, region: str = 'us-east-1') -> str:
+async def get_container_fleet_attributes(fleet_id: str, region: str = os.environ.get("AWS_REGION")) -> str:
     """Get container fleet attributes by fleet id
     
     Args:
@@ -98,7 +99,7 @@ async def get_container_fleet_attributes(fleet_id: str, region: str = 'us-east-1
 
 
 @mcp.tool()
-async def get_compute_auth_token(fleet_id: str, region: str = 'us-east-1', compute_name: str = '') -> str:
+async def get_compute_auth_token(fleet_id: str, region: str = os.environ.get("AWS_REGION"), compute_name: str = '') -> str:
     """Get compute auth token by fleet id and compute name
     
     Args:
@@ -120,7 +121,7 @@ async def get_compute_auth_token(fleet_id: str, region: str = 'us-east-1', compu
 
 
 @mcp.tool()
-async def get_vpc_peering_connections(fleet_id: str, region: str = 'us-east-1') -> str:
+async def get_vpc_peering_connections(fleet_id: str, region: str = os.environ.get("AWS_REGION")) -> str:
     """Get vpc peering connections by fleet id
     
     Args:
@@ -145,7 +146,7 @@ async def get_vpc_peering_connections(fleet_id: str, region: str = 'us-east-1') 
 
 
 @mcp.tool()
-async def get_builds(region: str = 'us-east-1') -> str:
+async def get_builds(region: str = os.environ.get("AWS_REGION")) -> str:
     """Get builds by region
     
     Args:
@@ -163,6 +164,37 @@ async def get_builds(region: str = 'us-east-1') -> str:
         else:
             response = client.list_builds()
         builds.extend(response.get('Builds', []))
+        next_token = response.get('NextToken')
+        if not next_token:
+            break
+    return builds
+
+
+@mcp.tool()
+async def get_fleet_capacity(fleet_id_list: List[str], region: str = os.environ.get("AWS_REGION")) -> str:
+    """Get fleet capacity by fleet id
+    
+    Args:
+        fleet_id: Gamelift fleet id
+    """
+    client = boto3.client('gamelift', region_name=region, 
+                          aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+                          aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
+    # check fleet is not a ANYWHERE Fleet
+    for fleet_id in fleet_id_list:
+        attr_response = client.describe_fleet_attributes(FleetIds=[fleet_id])
+        attrs = attr_response.get('FleetAttributes', [])
+        if not attrs or attrs[0].get('ComputeType') == 'ANYWHERE':
+            raise Exception('ANYWHERE Fleets do not support fleet capacity.')
+    
+    builds = []
+    next_token = None
+    while True:
+        if next_token:
+            response = client.describe_fleet_capacity(FleetIds=fleet_id_list, NextToken=next_token)
+        else:
+            response = client.describe_fleet_capacity(FleetIds=fleet_id_list)
+        builds.extend(response.get('FleetCapacity', []))
         next_token = response.get('NextToken')
         if not next_token:
             break

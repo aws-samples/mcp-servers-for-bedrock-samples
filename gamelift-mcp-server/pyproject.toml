@@ -4,4 +4,8 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "boto3>=1.38.18",
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.9.0",
+]
